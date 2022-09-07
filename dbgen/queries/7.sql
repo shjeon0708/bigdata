@@ -1,46 +1,18 @@
--- $ID$
--- TPC-H/TPC-R Volume Shipping Query (Q7)
--- Functional Query Definition
--- Approved February 1998
-:x
-:o
-select
-	supp_nation,
-	cust_nation,
-	l_year,
-	sum(volume) as revenue
-from
-	(
-		select
-			n1.n_name as supp_nation,
-			n2.n_name as cust_nation,
-			extract(year from l_shipdate) as l_year,
-			l_extendedprice * (1 - l_discount) as volume
-		from
-			supplier,
-			lineitem,
-			orders,
-			customer,
-			nation n1,
-			nation n2
-		where
-			s_suppkey = l_suppkey
-			and o_orderkey = l_orderkey
-			and c_custkey = o_custkey
-			and s_nationkey = n1.n_nationkey
-			and c_nationkey = n2.n_nationkey
-			and (
-				(n1.n_name = ':1' and n2.n_name = ':2')
-				or (n1.n_name = ':2' and n2.n_name = ':1')
-			)
-			and l_shipdate between date '1995-01-01' and date '1996-12-31'
-	) as shipping
-group by
-	supp_nation,
-	cust_nation,
-	l_year
-order by
-	supp_nation,
-	cust_nation,
-	l_year;
-:n -1
+SELECT
+SUPP_NATION, CUST_NATION, L_YEAR, SUM(VOLUME) AS REVENUE
+FROM
+( SELECT N1.N_NAME AS SUPP_NATION, N2.N_NAME AS CUST_NATION, EXTRACT(YEAR FROM L_SHIPDATE) AS L_YEAR, L_EXTENDEDPRICE * (1 - L_DISCOUNT) AS VOLUME
+FROM
+SUPPLIER, LINEITEM, ORDERS, CUSTOMER, NATION N1, NATION N2
+WHERE
+S_SUPPKEY = L_SUPPKEY
+AND O_ORDERKEY = L_ORDERKEY
+AND C_CUSTKEY = O_CUSTKEY
+AND S_NATIONKEY = N1.N_NATIONKEY
+AND C_NATIONKEY = N2.N_NATIONKEY
+AND ((N1.N_NAME = 'FRANCE' AND N2.N_NAME = 'GERMANY')
+OR (N1.N_NAME = 'GERMANY' AND N2.N_NAME = 'FRANCE')) AND L_SHIPDATE BETWEEN DATE '1995-01-01' AND DATE '1996-12-31') AS SHIPPING
+GROUP BY
+SUPP_NATION, CUST_NATION, L_YEAR
+ORDER BY
+SUPP_NATION, CUST_NATION, L_YEAR;
