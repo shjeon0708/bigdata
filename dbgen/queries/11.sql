@@ -1,34 +1,15 @@
--- $ID$
--- TPC-H/TPC-R Important Stock Identification Query (Q11)
--- Functional Query Definition
--- Approved February 1998
-:x
-:o
-select
-	ps_partkey,
-	sum(ps_supplycost * ps_availqty) as value
-from
-	partsupp,
-	supplier,
-	nation
-where
-	ps_suppkey = s_suppkey
-	and s_nationkey = n_nationkey
-	and n_name = ':1'
-group by
-	ps_partkey having
-		sum(ps_supplycost * ps_availqty) > (
-			select
-				sum(ps_supplycost * ps_availqty) * :2
-			from
-				partsupp,
-				supplier,
-				nation
-			where
-				ps_suppkey = s_suppkey
-				and s_nationkey = n_nationkey
-				and n_name = ':1'
-		)
-order by
-	value desc;
-:n -1
+SELECT
+PS_PARTKEY, SUM(PS_SUPPLYCOST * PS_AVAILQTY) AS VALUE FROM PARTSUPP, SUPPLIER, NATION
+WHERE
+PS_SUPPKEY = S_SUPPKEY AND S_NATIONKEY = N_NATIONKEY
+AND N_NAME = 'GERMANY'
+GROUP BY PS_PARTKEY HAVING SUM(PS_SUPPLYCOST * PS_AVAILQTY) > (
+SELECT
+SUM(PS_SUPPLYCOST * PS_AVAILQTY) * 0.0001
+FROM
+PARTSUPP, SUPPLIER, NATION
+WHERE PS_SUPPKEY = S_SUPPKEY
+AND S_NATIONKEY = N_NATIONKEY
+AND N_NAME = 'GERMANY')
+ORDER BY
+VALUE DESC;
