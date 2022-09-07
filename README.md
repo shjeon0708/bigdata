@@ -1,7 +1,7 @@
 Unzip the downloaded file Navigate through the command line to DBGEN folder
 
 ```
-cd Downloads/tpch_2_16_0/tpch_2_15_0/dbgen/
+cd Downloads/project/dbgen/
 ```
 
 Make a copy of the dummy makefile
