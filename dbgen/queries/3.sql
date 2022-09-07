@@ -1,29 +1,17 @@
--- $ID$
--- TPC-H/TPC-R Shipping Priority Query (Q3)
--- Functional Query Definition
--- Approved February 1998
-:x
-:o
-select
-	l_orderkey,
-	sum(l_extendedprice * (1 - l_discount)) as revenue,
-	o_orderdate,
-	o_shippriority
-from
-	customer,
-	orders,
-	lineitem
-where
-	c_mktsegment = ':1'
-	and c_custkey = o_custkey
-	and l_orderkey = o_orderkey
-	and o_orderdate < date ':2'
-	and l_shipdate > date ':2'
-group by
-	l_orderkey,
-	o_orderdate,
-	o_shippriority
-order by
-	revenue desc,
-	o_orderdate;
-:n 10
+SELECT
+L_ORDERKEY,
+SUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT)) AS REVENUE,
+O_ORDERDATE,
+O_SHIPPRIORITY
+FROM
+CUSTOMER, ORDERS, LINEITEM
+WHERE
+C_MKTSEGMENT = 'BUILDING'
+AND C_CUSTKEY = O_CUSTKEY
+AND L_ORDERKEY = O_ORDERKEY
+AND O_ORDERDATE < DATE '1995-03-15' AND L_SHIPDATE > DATE '1995-03-15'
+GROUP BY
+L_ORDERKEY, O_ORDERDATE, O_SHIPPRIORITY
+ORDER BY
+REVENUE DESC, O_ORDERDATE
+LIMIT 10;
