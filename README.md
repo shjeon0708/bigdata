@@ -1,11 +1,20 @@
-$ cd Downloads/tpch_2_16_0/tpch_2_15_0/dbgen/
+### Unzip the downloaded file Navigate through the command line to DBGEN folder
+
+```
+cd Downloads/tpch_2_16_0/tpch_2_15_0/dbgen/
+```
+
 Make a copy of the dummy makefile
 
-$ cp makefile.suite makefile
+```
+cp makefile.suite makefile
+```
+
 In dbgen folder find the created makefile and insert highlighted values (bold) to this file.
 
+```
 ################
-## CHANGE NAME OF ANSI COMPILER HERE
+##CHANGE NAME OF ANSI COMPILER HERE
 ################
 CC      = gcc
 # Current values for DATABASE are: INFORMIX, DB2, TDAT (Teradata)
@@ -18,8 +27,11 @@ MACHINE = *LINUX*
 WORKLOAD = *TPCH*
 #
 ...
+```
+
 In dbgen folder find the tpcd.h file and edit higlighted (bold) values for SQLSERVER.
 
+```
 ...
 #ifdef  SQLSERVER
 #define GEN_QUERY_PLAN  "set showplan on\nset noexec on\ngo\n"
@@ -30,19 +42,25 @@ In dbgen folder find the tpcd.h file and edit higlighted (bold) values for SQLSE
 #define SET_DBASE       "use %s;\n"
 #endif
 ...
+```
 Run make command.
 
+```
 $ make
+```
+
 Generate the files for population. (The last numeric parametr determines the volume of data with which will be your database then populated - I decided that 0.1 (=100MB) is fine for my purposes, since I am not interested in the database benchmark tests.
-
+```
 $ ./dbgen -s 0.1
+```
 Connect to SQL server with permission to reach local files, create database and connect to schema.
-
+```
 $ mysql -u root -p --local-infile
 $ mysql> CREATE DATABASE tpch;
 $ mysql> USE tpch;
+```
 Run following queries in SQL console uploaded in this repository.
-
+```
 CREATE TABLE NATION  ( N_NATIONKEY  INTEGER NOT NULL,
                             N_NAME       CHAR(25) NOT NULL,
                             N_REGIONKEY  INTEGER NOT NULL,
@@ -111,8 +129,10 @@ CREATE TABLE LINEITEM ( L_ORDERKEY    INTEGER NOT NULL,
                              L_SHIPINSTRUCT CHAR(25) NOT NULL,
                              L_SHIPMODE     CHAR(10) NOT NULL,
                              L_COMMENT      VARCHAR(44) NOT NULL);
+```
 Populate tables with generated dummy data.
 
+```
 LOAD DATA LOCAL INFILE 'customer.tbl' INTO TABLE CUSTOMER FIELDS TERMINATED BY '|';
 LOAD DATA LOCAL INFILE 'orders.tbl' INTO TABLE ORDERS FIELDS TERMINATED BY '|';
 LOAD DATA LOCAL INFILE 'lineitem.tbl' INTO TABLE LINEITEM FIELDS TERMINATED BY '|';
@@ -121,8 +141,9 @@ LOAD DATA LOCAL INFILE 'partsupp.tbl' INTO TABLE PARTSUPP FIELDS TERMINATED BY '
 LOAD DATA LOCAL INFILE 'part.tbl' INTO TABLE PART FIELDS TERMINATED BY '|';
 LOAD DATA LOCAL INFILE 'region.tbl' INTO TABLE REGION FIELDS TERMINATED BY '|';
 LOAD DATA LOCAL INFILE 'supplier.tbl' INTO TABLE SUPPLIER FIELDS TERMINATED BY '|';
+```
 Alter the schema dependencies (The original statement can be found in dss.ri. This is my modified version in order to work with MySQL.)
-
+```
 ALTER TABLE REGION
 ADD PRIMARY KEY (R_REGIONKEY);
 ALTER TABLE NATION
@@ -153,4 +174,5 @@ ALTER TABLE LINEITEM
 ADD FOREIGN KEY LINEITEM_FK1 (L_ORDERKEY)  references ORDERS(O_ORDERKEY);
 ALTER TABLE LINEITEM
 ADD FOREIGN KEY LINEITEM_FK2 (L_PARTKEY,L_SUPPKEY) references PARTSUPP(PS_PARTKEY, PS_SUPPKEY);
+```
 Now you can run your test the queries uploaded in this repository. Hope that's useful!
