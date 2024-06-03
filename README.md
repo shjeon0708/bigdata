@@ -1,178 +1,180 @@
-Unzip the downloaded file Navigate through the command line to DBGEN folder
+사용법
+git 설치 및 다운로드
 
 ```
-cd Downloads/project/dbgen/
+sudo apt install git
+git clone https://github.com/shjeon0708/bigdata.git
 ```
 
-Make a copy of the dummy makefile
+실행 전 수업시간에 진행했던 배포파일은 모두 kubectl delete -f로 제거 후 진행하세요.
 
-```
-cp makefile.suite makefile
-```
 
-In dbgen folder find the created makefile and insert highlighted values (bold) to this file.
-
+strimzi.io ClusterRoles 및 ClusterRoleBindings 배포
 ```
-################
-##CHANGE NAME OF ANSI COMPILER HERE
-################
-CC      = gcc
-# Current values for DATABASE are: INFORMIX, DB2, TDAT (Teradata)
-#                                  SQLSERVER, SYBASE, ORACLE, VECTORWISE
-# Current values for MACHINE are:  ATT, DOS, HP, IBM, ICL, MVS, 
-#                                  SGI, SUN, U2200, VMS, LINUX, WIN32 
-# Current values for WORKLOAD are:  TPCH
-DATABASE= SQLSERVER
-MACHINE = LINUX
-WORKLOAD = TPCH
-#
-...
+kubectl create -f 'https://strimzi.io/install/latest?namespace=kafka' -n kafka
 ```
 
-In dbgen folder find the tpcd.h file and edit higlighted (bold) values for SQLSERVER.
-
+아파치 카프카 클러스터 생성
 ```
-...
-#ifdef  SQLSERVER
-#define GEN_QUERY_PLAN  "set showplan on\nset noexec on\ngo\n"
-#define START_TRAN      "**BEGIN WORK;**"
-#define END_TRAN        "**COMMIT WORK;**"
-#define SET_OUTPUT      ""
-#define SET_ROWCOUNT    "limit %d;\n\n"
-#define SET_DBASE       "use %s;\n"
-#endif
-...
-```
-Run make command.
-
-```
-$ make
+kubectl apply -f https://strimzi.io/examples/latest/kafka/kraft/kafka-single-node.yaml -n kafka
 ```
 
-Generate the files for population. (The last numeric parametr determines the volume of data with which will be your database then populated - I decided that 0.1 (=100MB) is fine for my purposes, since I am not interested in the database benchmark tests.
+생성된 pod 확인
 ```
-$ ./dbgen -s 0.1
+kubectl get all -n kafka
 ```
-Connect to SQL server with permission to reach local files, create database and connect to schema.
+실습에 사용될 DB 배포 (MySQL 및 PostgreSQL)
 ```
-$ mysql -u root -p --local-infile
-$ mysql> CREATE DATABASE tpch;
-$ mysql> USE tpch;
+kubectl apply -f bigdata/db/
 ```
-Run following queries in SQL console uploaded in this repository.
-```
-CREATE TABLE NATION  ( N_NATIONKEY  INTEGER NOT NULL,
-                            N_NAME       CHAR(25) NOT NULL,
-                            N_REGIONKEY  INTEGER NOT NULL,
-                            N_COMMENT    VARCHAR(152));
 
-CREATE TABLE REGION  ( R_REGIONKEY  INTEGER NOT NULL,
-                            R_NAME       CHAR(25) NOT NULL,
-                            R_COMMENT    VARCHAR(152));
-
-CREATE TABLE PART  ( P_PARTKEY     INTEGER NOT NULL,
-                          P_NAME        VARCHAR(55) NOT NULL,
-                          P_MFGR        CHAR(25) NOT NULL,
-                          P_BRAND       CHAR(10) NOT NULL,
-                          P_TYPE        VARCHAR(25) NOT NULL,
-                          P_SIZE        INTEGER NOT NULL,
-                          P_CONTAINER   CHAR(10) NOT NULL,
-                          P_RETAILPRICE DECIMAL(15,2) NOT NULL,
-                          P_COMMENT     VARCHAR(23) NOT NULL );
-
-CREATE TABLE SUPPLIER ( S_SUPPKEY     INTEGER NOT NULL,
-                             S_NAME        CHAR(25) NOT NULL,
-                             S_ADDRESS     VARCHAR(40) NOT NULL,
-                             S_NATIONKEY   INTEGER NOT NULL,
-                             S_PHONE       CHAR(15) NOT NULL,
-                             S_ACCTBAL     DECIMAL(15,2) NOT NULL,
-                             S_COMMENT     VARCHAR(101) NOT NULL);
-
-CREATE TABLE PARTSUPP ( PS_PARTKEY     INTEGER NOT NULL,
-                             PS_SUPPKEY     INTEGER NOT NULL,
-                             PS_AVAILQTY    INTEGER NOT NULL,
-                             PS_SUPPLYCOST  DECIMAL(15,2)  NOT NULL,
-                             PS_COMMENT     VARCHAR(199) NOT NULL );
-
-CREATE TABLE CUSTOMER ( C_CUSTKEY     INTEGER NOT NULL,
-                             C_NAME        VARCHAR(25) NOT NULL,
-                             C_ADDRESS     VARCHAR(40) NOT NULL,
-                             C_NATIONKEY   INTEGER NOT NULL,
-                             C_PHONE       CHAR(15) NOT NULL,
-                             C_ACCTBAL     DECIMAL(15,2)   NOT NULL,
-                             C_MKTSEGMENT  CHAR(10) NOT NULL,
-                             C_COMMENT     VARCHAR(117) NOT NULL);
-
-CREATE TABLE ORDERS  ( O_ORDERKEY       INTEGER NOT NULL,
-                           O_CUSTKEY        INTEGER NOT NULL,
-                           O_ORDERSTATUS    CHAR(1) NOT NULL,
-                           O_TOTALPRICE     DECIMAL(15,2) NOT NULL,
-                           O_ORDERDATE      DATE NOT NULL,
-                           O_ORDERPRIORITY  CHAR(15) NOT NULL,  
-                           O_CLERK          CHAR(15) NOT NULL, 
-                           O_SHIPPRIORITY   INTEGER NOT NULL,
-                           O_COMMENT        VARCHAR(79) NOT NULL);
-
-CREATE TABLE LINEITEM ( L_ORDERKEY    INTEGER NOT NULL,
-                             L_PARTKEY     INTEGER NOT NULL,
-                             L_SUPPKEY     INTEGER NOT NULL,
-                             L_LINENUMBER  INTEGER NOT NULL,
-                             L_QUANTITY    DECIMAL(15,2) NOT NULL,
-                             L_EXTENDEDPRICE  DECIMAL(15,2) NOT NULL,
-                             L_DISCOUNT    DECIMAL(15,2) NOT NULL,
-                             L_TAX         DECIMAL(15,2) NOT NULL,
-                             L_RETURNFLAG  CHAR(1) NOT NULL,
-                             L_LINESTATUS  CHAR(1) NOT NULL,
-                             L_SHIPDATE    DATE NOT NULL,
-                             L_COMMITDATE  DATE NOT NULL,
-                             L_RECEIPTDATE DATE NOT NULL,
-                             L_SHIPINSTRUCT CHAR(25) NOT NULL,
-                             L_SHIPMODE     CHAR(10) NOT NULL,
-                             L_COMMENT      VARCHAR(44) NOT NULL);
-```
-Populate tables with generated dummy data.
+Schema Registry, Kafka Connect 생성
 
 ```
-LOAD DATA LOCAL INFILE 'customer.tbl' INTO TABLE CUSTOMER FIELDS TERMINATED BY '|';
-LOAD DATA LOCAL INFILE 'orders.tbl' INTO TABLE ORDERS FIELDS TERMINATED BY '|';
-LOAD DATA LOCAL INFILE 'lineitem.tbl' INTO TABLE LINEITEM FIELDS TERMINATED BY '|';
-LOAD DATA LOCAL INFILE 'nation.tbl' INTO TABLE NATION FIELDS TERMINATED BY '|';
-LOAD DATA LOCAL INFILE 'partsupp.tbl' INTO TABLE PARTSUPP FIELDS TERMINATED BY '|';
-LOAD DATA LOCAL INFILE 'part.tbl' INTO TABLE PART FIELDS TERMINATED BY '|';
-LOAD DATA LOCAL INFILE 'region.tbl' INTO TABLE REGION FIELDS TERMINATED BY '|';
-LOAD DATA LOCAL INFILE 'supplier.tbl' INTO TABLE SUPPLIER FIELDS TERMINATED BY '|';
+kubectl bigdata/schema-registry.yaml
+kubectl bigdata/kafka-connect.yaml
 ```
-Alter the schema dependencies (The original statement can be found in dss.ri. This is my modified version in order to work with MySQL.)
+
+source 커넥터 및 sink 커넥터 생성
 ```
-ALTER TABLE REGION
-ADD PRIMARY KEY (R_REGIONKEY);
-ALTER TABLE NATION
-ADD PRIMARY KEY (N_NATIONKEY);
-ALTER TABLE NATION
-ADD FOREIGN KEY NATION_FK1 (N_REGIONKEY) references REGION(R_REGIONKEY);
-ALTER TABLE PART
-ADD PRIMARY KEY (P_PARTKEY);
-ALTER TABLE SUPPLIER  
-ADD PRIMARY KEY (S_SUPPKEY);
-ALTER TABLE SUPPLIER
-ADD FOREIGN KEY SUPPLIER_FK1 (S_NATIONKEY) references NATION(N_NATIONKEY);
-ALTER TABLE PARTSUPP
-ADD PRIMARY KEY (PS_PARTKEY,PS_SUPPKEY);
-ALTER TABLE CUSTOMER
-ADD PRIMARY KEY (C_CUSTKEY);
-ALTER TABLE CUSTOMER
-ADD FOREIGN KEY CUSTOMER_FK1 (C_NATIONKEY) references NATION(N_NATIONKEY);
-ALTER TABLE LINEITEM
-ADD PRIMARY KEY (L_ORDERKEY,L_LINENUMBER);
-ALTER TABLE PARTSUPP
-ADD FOREIGN KEY PARTSUPP_FK1 (PS_SUPPKEY) references SUPPLIER(S_SUPPKEY);
-ALTER TABLE PARTSUPP
-ADD FOREIGN KEY PARTSUPP_FK2 (PS_PARTKEY) references PART(P_PARTKEY);
-ALTER TABLE ORDERS
-ADD FOREIGN KEY ORDERS_FK1 (O_CUSTKEY) references CUSTOMER(C_CUSTKEY);
-ALTER TABLE LINEITEM
-ADD FOREIGN KEY LINEITEM_FK1 (L_ORDERKEY)  references ORDERS(O_ORDERKEY);
-ALTER TABLE LINEITEM
-ADD FOREIGN KEY LINEITEM_FK2 (L_PARTKEY,L_SUPPKEY) references PARTSUPP(PS_PARTKEY, PS_SUPPKEY);
+kubectl apply -f bigdata/kafka-mysql-source-connector.yaml
+kubectl apply -f bigdata/kafka-postgres-sink-connector.yaml
 ```
-Now you can run your test the queries uploaded in this repository. Hope that's useful!
+MySQL의 test 데이터베이스에 있는 example 테이블이 PostgreSQL에서 읽어지는지 확인
+```
+kubectl get po -n kafka
+kubectl exec -it {postgres pod} -n kafka -- psql -U postgres
+```
+PostgreSQL 접속 후 
+```
+\dt
+select * from example;
+```
+
+옮겨진게 확인이 됐다면 
+
+python pod 생성
+```
+kubectl apply -f bigdata/python.yaml
+```
+
+MySQL 접속 후 크롤링에 사용될 데이터베이스 및 사용자 생성
+```
+kubectl exec -it {mysql pod} -n kafka -- mysql -u root -p
+
+CREATE DATABASE crawl_db DEFAULT CHARACTER SET utf8; #데이터베이스 생성
+CREATE USER crawl_user IDENTIFIED BY 'Dankook1!'; #유저명 :crawl_user, 패스워드 Dankook1! 
+GRANT ALL ON crawl_db.* TO crawl_user; crawl_db 데이터베이스의 권한을 crawl_crawl_user에게 주기
+
+```
+
+Python 접속 및 pip패키지 설치
+```
+kubectl exec -it python -- /bin/bash
+
+apt update && apt install vim #pod 접속 후 업데이트 및 vim 편집기 설치
+pip install mysqlclient #pip을 이용해 mysqlclient 패키지 설치
+pip install requests
+
+```
+
+크롤링 코드 작성
+```
+vi melon.py
+
+import MySQLdb
+import requests
+from bs4 import BeautifulSoup
+
+if __name__ == "__main__":
+    RANK = 100  # 멜론 차트 순위가 1 ~ 100위까지 있음
+
+    header = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko'}
+    req = requests.get('https://www.melon.com/chart/week/index.htm',
+                       headers=header)  # 주간 차트를 크롤링 할 것임
+    html = req.text
+    parse = BeautifulSoup(html, 'html.parser')
+
+    titles = parse.find_all("div", {"class": "ellipsis rank01"})
+    singers = parse.find_all("div", {"class": "ellipsis rank02"})
+
+    title = []
+    singer = []
+
+    for t in titles:
+        title.append(t.find('a').text)
+
+    for s in singers:
+        singer.append(s.find('span', {"class": "checkEllipsis"}).text)
+    items = [item for item in zip(title, singer)]
+
+conn = MySQLdb.connect(
+    user="crawl_user",
+    passwd="Dankook1!",
+    host="10.100.111.92", #host 확인하는 방법 kubectl get svc -n kafka 명령어로 mysql의 cluster-ip확인 CH13의 (20p 참조)
+    db="crawl_db"
+    # charset="utf-8"
+)
+cursor = conn.cursor()
+cursor.execute("DROP TABLE IF EXISTS melon")
+
+cursor.execute("CREATE TABLE melon (`rank` int, title text, singer text)")
+
+
+i = 1
+
+for item in items:
+    cursor.execute(
+        "INSERT INTO melon (rank, title, singer) VALUES (%s, %s, %s)", (i, item[0], item[1]))
+    i +=1
+
+conn.commit()
+```
+
+source-connector와 sink-connetor 수정
+
+kafka-mysql-source-connector.yaml
+
+```
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaConnector
+metadata:
+  name: jdbc-mysql-source-connector
+  namespace: kafka
+  labels:
+    strimzi.io/cluster: my-connect-cluster3
+spec:
+  class: io.confluent.connect.jdbc.JdbcSourceConnector
+  tasksMax: 1
+  config:
+    mode: "bulk"
+    poll.interval.ms: "86400000"
+    #mode: "incrementing"
+    #incrementing.column.name: "id"
+
+    connection.url: "jdbc:mysql://mysql.kafka.svc.cluster.local:3306/crawl_db"
+    connection.user: "crawl_user"
+    connection.password: "Dankook1!"
+    table.whitelist: "melon"
+```
+
+kafka-mysql-source-connector.yaml
+```
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaConnector
+metadata:
+  name: postgres-connector
+  namespace: kafka
+  labels:
+    strimzi.io/cluster: my-connect-cluster3
+spec:
+  class: io.confluent.connect.jdbc.JdbcSinkConnector
+  tasksMax: 1
+  config:
+    topics: "melon"
+    connection.url: "jdbc:postgresql://postgres-service.kafka.svc.cluster.local:5432/postgres"
+    connection.user: "postgres"
+    connection.password: "root"
+    auto.create: "true"
+```
