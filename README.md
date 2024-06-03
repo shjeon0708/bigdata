@@ -31,8 +31,8 @@ kubectl apply -f bigdata/db/
 Schema Registry, Kafka Connect 생성
 
 ```
-kubectl bigdata/schema-registry.yaml
-kubectl bigdata/kafka-connect.yaml
+kubectl apply -f bigdata/schema-registry.yaml
+kubectl apply -f bigdata/kafka-connect.yaml
 ```
 
 source 커넥터 및 sink 커넥터 생성
