@@ -70,7 +70,7 @@ GRANT ALL ON crawl_db.* TO crawl_user; crawl_db 데이터베이스의 권한을 
 
 Python 접속 및 pip패키지 설치
 ```
-kubectl exec -it python -- /bin/bash
+kubectl exec -it python -n kafka -- /bin/bash
 
 apt update && apt install vim #pod 접속 후 업데이트 및 vim 편집기 설치
 pip install mysqlclient #pip을 이용해 mysqlclient 패키지 설치
