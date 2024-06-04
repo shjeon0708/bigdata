@@ -159,7 +159,8 @@ spec:
     table.whitelist: "melon"
 ```
 
-kafka-mysql-source-connector.yaml
+kafka-postgres-sink-connector.yaml
+
 ```
 apiVersion: kafka.strimzi.io/v1beta2
 kind: KafkaConnector
