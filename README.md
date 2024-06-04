@@ -64,7 +64,7 @@ kubectl exec -it {mysql pod} -n kafka -- mysql -u root -p
 
 CREATE DATABASE crawl_db DEFAULT CHARACTER SET utf8; #데이터베이스 생성
 CREATE USER crawl_user IDENTIFIED BY 'Dankook1!'; #유저명 :crawl_user, 패스워드 Dankook1! 
-GRANT ALL ON crawl_db.* TO crawl_user; crawl_db 데이터베이스의 권한을 crawl_crawl_user에게 주기
+GRANT ALL ON crawl_db.* TO crawl_user; crawl_db 데이터베이스의 권한을 crawl_user에게 주기
 
 ```
 
