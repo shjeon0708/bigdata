@@ -186,3 +186,12 @@ spec:
     connection.password: "root"
     auto.create: "true"
 ```
+
+실행 시 PostgreSQL에 테이블이 없다면 source와 sink 커넥터를 삭제 후 다시 apply
+```
+kubectl delete -f bigdata/kafka-mysql-source-connector.yaml
+kubectl delete -f bigdata/kafka-postgres-sink-connector.yaml
+
+kubectl apply -f bigdata/kafka-mysql-source-connector.yaml
+kubectl apply -f bigdata/kafka-postgres-sink-connector.yaml
+```
