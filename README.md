@@ -75,6 +75,7 @@ kubectl exec -it python -n kafka -- /bin/bash
 apt update && apt install vim #pod 접속 후 업데이트 및 vim 편집기 설치
 pip install mysqlclient #pip을 이용해 mysqlclient 패키지 설치
 pip install requests
+pip install beautifulsoup4
 
 ```
 
