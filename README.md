@@ -80,9 +80,11 @@ pip install beautifulsoup4
 ```
 
 크롤링 코드 작성
+vim 편집기로 melon.py 생성
 ```
 vi melon.py
-
+```
+```
 import MySQLdb
 import requests
 from bs4 import BeautifulSoup
@@ -131,6 +133,10 @@ for item in items:
     i +=1
 
 conn.commit()
+```
+코드 실행
+```
+python melon.py
 ```
 
 source-connector와 sink-connetor 수정
