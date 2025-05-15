@@ -32,14 +32,14 @@ kubectl apply -f bigdata/db/
 Schema Registry, Kafka Connect 생성
 
 ```
-kubectl apply -f bigdata/schema-registry.yaml
-kubectl apply -f bigdata/kafka-connect.yaml
+kubectl apply -f bigdata/kafka/schema-registry.yaml
+kubectl apply -f bigdata/kafka/kafka-connect.yaml
 ```
 
 source 커넥터 및 sink 커넥터 생성
 ```
-kubectl apply -f bigdata/kafka-mysql-source-connector.yaml
-kubectl apply -f bigdata/kafka-postgres-sink-connector.yaml
+kubectl apply -f bigdata/kafka/kafka-mysql-source-connector.yaml
+kubectl apply -f bigdata/kafka/kafka-postgres-sink-connector.yaml
 ```
 MySQL의 test 데이터베이스에 있는 example 테이블이 PostgreSQL에서 읽어지는지 확인
 ```
