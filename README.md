@@ -12,11 +12,12 @@ git clone https://github.com/shjeon0708/bigdata.git
 strimzi.io ClusterRoles 및 ClusterRoleBindings 배포
 ```
 kubectl create -f 'https://strimzi.io/install/latest?namespace=kafka' -n kafka
+
 ```
 
 아파치 카프카 클러스터 생성
 ```
-kubectl apply -f https://strimzi.io/examples/latest/kafka/kraft/kafka-single-node.yaml -n kafka
+kubectl apply -f https://strimzi.io/examples/latest/kafka/kafka-single-node.yaml -n kafka
 ```
 
 생성된 pod 확인
