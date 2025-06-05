@@ -116,7 +116,7 @@ if __name__ == "__main__":
 conn = MySQLdb.connect(
     user="crawl_user",
     passwd="Dankook1!",
-    host="10.100.111.92", #host 확인하는 방법 kubectl get svc -n kafka 명령어로 mysql의 cluster-ip확인 CH13의 (20p 참조)
+    host="10.100.111.92", #host 확인하는 방법 kubectl get svc 명령어로 mysql의 cluster-ip
     db="crawl_db"
     # charset="utf-8"
 )
@@ -134,65 +134,4 @@ for item in items:
     i +=1
 
 conn.commit()
-```
-코드 실행
-```
-python melon.py
-```
-
-source-connector와 sink-connetor 수정
-
-kafka-mysql-source-connector.yaml
-
-```
-apiVersion: kafka.strimzi.io/v1beta2
-kind: KafkaConnector
-metadata:
-  name: jdbc-mysql-source-connector
-  namespace: kafka
-  labels:
-    strimzi.io/cluster: my-connect-cluster3
-spec:
-  class: io.confluent.connect.jdbc.JdbcSourceConnector
-  tasksMax: 1
-  config:
-    mode: "bulk"
-    poll.interval.ms: "86400000"
-    #mode: "incrementing"
-    #incrementing.column.name: "id"
-
-    connection.url: "jdbc:mysql://mysql.kafka.svc.cluster.local:3306/crawl_db"
-    connection.user: "crawl_user"
-    connection.password: "Dankook1!"
-    table.whitelist: "melon"
-```
-
-kafka-postgres-sink-connector.yaml
-
-```
-apiVersion: kafka.strimzi.io/v1beta2
-kind: KafkaConnector
-metadata:
-  name: postgres-connector
-  namespace: kafka
-  labels:
-    strimzi.io/cluster: my-connect-cluster3
-spec:
-  class: io.confluent.connect.jdbc.JdbcSinkConnector
-  tasksMax: 1
-  config:
-    topics: "melon"
-    connection.url: "jdbc:postgresql://postgres-service.kafka.svc.cluster.local:5432/postgres"
-    connection.user: "postgres"
-    connection.password: "root"
-    auto.create: "true"
-```
-
-실행 시 PostgreSQL에 테이블이 없다면 source와 sink 커넥터를 삭제 후 다시 apply
-```
-kubectl delete -f bigdata/kafka-mysql-source-connector.yaml
-kubectl delete -f bigdata/kafka-postgres-sink-connector.yaml
-
-kubectl apply -f bigdata/kafka-mysql-source-connector.yaml
-kubectl apply -f bigdata/kafka-postgres-sink-connector.yaml
 ```
