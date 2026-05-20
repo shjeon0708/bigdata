@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-config
+  namespace: kafka
+data:
+  my.cnf: |
+    [mysqld]
+    server-id        = 184054
+    log-bin          = mysql-bin
+    binlog_format    = ROW
+  initdb.sql: |
+    USE test;
+    CREATE TABLE IF NOT EXISTS example (
+      id   INT(16) NOT NULL,
+      name VARCHAR(32),
+      PRIMARY KEY (id)
+    );
+    INSERT INTO example VALUES (111, 'connecttest');
