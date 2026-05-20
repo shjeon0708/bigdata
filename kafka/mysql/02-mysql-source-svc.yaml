@@ -1,10 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: mysql
+  name: mysql-source
   namespace: kafka
 spec:
   ports:
-    - port: 3306
+  - port: 3306
   selector:
-    app: mysql
+    app: mysql-source
+  clusterIP: None
