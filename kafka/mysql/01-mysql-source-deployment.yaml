@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-source
+  namespace: kafka
+spec:
+  selector:
+    matchLabels:
+      app: mysql-source
+  template:
+    metadata:
+      labels:
+        app: mysql-source
+    spec:
+      containers:
+      - name: mysql
+        image: mysql:5.6
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: "Dankook1!"
+        ports:
+        - containerPort: 3306
