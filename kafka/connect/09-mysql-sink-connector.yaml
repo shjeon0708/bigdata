@@ -1,0 +1,18 @@
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaConnector
+metadata:
+  name: jdbc-mysql-sink-connector
+  namespace: kafka
+  labels:
+    strimzi.io/cluster: my-connect-cluster3
+spec:
+  class: io.confluent.connect.jdbc.JdbcSinkConnector
+  tasksMax: 1
+  config:
+    connection.url: "jdbc:mysql://mysql-target.kafka.svc.cluster.local:3306/test"
+    connection.user: "root"
+    connection.password: "Dankook1!"
+    topics: "example"
+    auto.create: "true"
+    insert.mode: "insert"
+ 
