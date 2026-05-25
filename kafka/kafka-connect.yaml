@@ -1,0 +1,32 @@
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaConnect
+metadata:
+  name: my-connect-cluster3
+  namespace: kafka
+  annotations:
+    strimzi.io/use-connector-resources: "true"
+spec:
+  image: docker.io/shjeon0617/kafka-connect-jdbc:3.0
+  version: 4.2.0
+  replicas: 1
+  bootstrapServers: my-cluster-kafka-bootstrap:9092
+  groupId: connect-cluster3
+  configStorageTopic: connect-cluster3-configs
+  offsetStorageTopic: connect-cluster3-offsets
+  statusStorageTopic: connect-cluster3-status
+  resources:
+    requests:
+      memory: 512Mi
+    limits:
+      memory: 1Gi
+  jvmOptions:
+    "-Xms": "256m"
+    "-Xmx": "512m"
+  config:
+    config.storage.replication.factor: 1
+    offset.storage.replication.factor: 1
+    status.storage.replication.factor: 1
+    key.converter: org.apache.kafka.connect.json.JsonConverter
+    value.converter: org.apache.kafka.connect.json.JsonConverter
+    key.converter.schemas.enable: true
+    value.converter.schemas.enable: true
