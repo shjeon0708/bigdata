@@ -1,0 +1,19 @@
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaConnector
+metadata:
+  name: postgres-sink-connector
+  namespace: kafka
+  labels:
+    strimzi.io/cluster: my-connect-cluster3
+spec:
+  class: io.confluent.connect.jdbc.JdbcSinkConnector
+  tasksMax: 1
+  config:
+    topics: "mysql-example,mysql-melon"
+    connection.url: "jdbc:postgresql://postgres-service.kafka.svc.cluster.local:5432/postgres"
+    connection.user: "postgres"
+    connection.password: "Dankook1!"
+    auto.create: "true"
+    auto.evolve: "true"
+    insert.mode: "insert"
+    pk.mode: "none"
