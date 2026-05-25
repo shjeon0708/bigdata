@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-config
+  namespace: kafka
+data:
+  initdb.sql: |
+    CREATE DATABASE IF NOT EXISTS test;
+    USE test;
+    CREATE TABLE example (
+      id INT NOT NULL AUTO_INCREMENT,
+      name VARCHAR(32),
+      PRIMARY KEY (id)
+    );
+    INSERT INTO example (name) VALUES ('connecttest');
