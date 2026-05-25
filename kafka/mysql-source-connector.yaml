@@ -14,5 +14,5 @@ spec:
     connection.password: "Dankook1!"
     mode: "incrementing"
     incrementing.column.name: "id"
-    table.whitelist: "example,melon"
+    table.whitelist: "example"
     topic.prefix: "mysql-"
